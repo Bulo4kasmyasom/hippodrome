@@ -27,7 +27,7 @@ public class HorseTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", " ", "  "})
+    @ValueSource(strings = {"", " ", "\t\t", "\n", "\n\n\n\n"})
     public void nameShouldBeEmpty(String input) {
         assertThrows(IllegalArgumentException.class, () -> new Horse(input, 123));
     }
@@ -118,6 +118,9 @@ public class HorseTest {
             horse.move();
 
             mockedStatic.verify(() -> Horse.getRandomDouble(0.2, 0.9));
+//            mockedStatic.verify(() -> Horse.getRandomDouble(anyDouble(), anyDouble()));
+//            mockedStatic.verify(() -> Horse.getRandomDouble(0.2, anyDouble())); // так нельзя
+//            mockedStatic.verify(() -> Horse.getRandomDouble(eq(0.2), anyDouble()));
         }
     }
 
