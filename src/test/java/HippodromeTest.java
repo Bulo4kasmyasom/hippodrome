@@ -1,5 +1,6 @@
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,60 +10,68 @@ import static org.mockito.Mockito.verify;
 
 public class HippodromeTest {
 
+    public static final Class<IllegalArgumentException> EXPECTED_IA_EXCEPTION_CLASS = IllegalArgumentException.class;
+
     @Test
-    public void shouldBeExceptionWhenParamIsNull()
-    {
-        Assert.assertThrows(IllegalArgumentException.class, () -> new Hippodrome(null));
+    public void whenConstructorIsNullTrowsException() {
+        ThrowingRunnable throwingRunnable = () -> new Hippodrome(null);
+        Assert.assertThrows(EXPECTED_IA_EXCEPTION_CLASS, throwingRunnable);
     }
 
     @Test
-    public void shouldBeExceptionWhenParamIsNullGetMessage()
-    {
-        IllegalArgumentException exception = Assert.assertThrows(
-                IllegalArgumentException.class,
-                () -> new Hippodrome(null)
-        );
-        Assert.assertEquals("Horses cannot be null.", exception.getMessage());
+    public void whenConstructorIsNullTrowsExceptionGetMessage() {
+        ThrowingRunnable throwingRunnable = () -> new Hippodrome(null);
+
+        IllegalArgumentException exception = Assert.assertThrows(EXPECTED_IA_EXCEPTION_CLASS, throwingRunnable);
+        String expected = "Horses cannot be null.";
+        String actual = exception.getMessage();
+
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
-    public void shouldBeExceptionWhenListSizeIsEmpty()
-    {
-        List<Horse> horses = new ArrayList<>();
-        Assert.assertThrows(IllegalArgumentException.class, () -> new Hippodrome(horses));
+    public void shouldBeExceptionWhenHorsesListSizeInConstructorIsEmpty() {
+        List<Horse> horseList = new ArrayList<>();
+        ThrowingRunnable throwingRunnable = () -> new Hippodrome(horseList);
+
+        Assert.assertThrows(EXPECTED_IA_EXCEPTION_CLASS, throwingRunnable);
     }
 
     @Test
-    public void shouldBeExceptionWhenListSizeIsEmptyGetMessage()
-    {
-        List<Horse> horses = new ArrayList<>();
-        IllegalArgumentException exception = Assert.assertThrows(
-                IllegalArgumentException.class,
-                () -> new Hippodrome(horses)
-        );
-        Assert.assertEquals("Horses cannot be empty.", exception.getMessage());
+    public void shouldBeExceptionWhenHorsesListSizeInConstructorIsEmptyGetMessage() {
+        List<Horse> horseList = new ArrayList<>();
+        ThrowingRunnable throwingRunnable = () -> new Hippodrome(horseList);
+
+        IllegalArgumentException exception = Assert.assertThrows(EXPECTED_IA_EXCEPTION_CLASS, throwingRunnable);
+        String expected = "Horses cannot be empty.";
+        String actual = exception.getMessage();
+
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
-    public void verifyListHippodromeWithHorses()
-    {
+    public void verifyListHippodromeWithHorses() {
         List<Horse> horseList = new ArrayList<>();
         for (int i = 0; i < 30; i++) {
-            horseList.add(new Horse("Horse_"+i, i, i));
+            horseList.add(new Horse("Horse_" + i, i, i));
         }
+
         Hippodrome hippodrome = new Hippodrome(horseList);
-        Assert.assertEquals(horseList, hippodrome.getHorses());
+        List<Horse> actual = hippodrome.getHorses();
+
+        Assert.assertEquals(horseList, actual);
     }
 
     @Test
-    public void verifyMoveHorse()
-    {
+    public void checkWhatInvokedMethodMoveAtAllHorses() {
         List<Horse> horsesList = new ArrayList<>();
+        Hippodrome hippodrome = new Hippodrome(horsesList);
+        Horse mock = mock(Horse.class);
+
         for (int i = 0; i < 50; i++) {
-            horsesList.add(mock(Horse.class));
+            horsesList.add(mock);
         }
 
-        Hippodrome hippodrome = new Hippodrome(horsesList);
         hippodrome.move();
         for (Horse horse : horsesList) {
             verify(horse).move();
@@ -70,22 +79,19 @@ public class HippodromeTest {
     }
 
     @Test
-    public void checkWinner()
-    {
-        Horse name1 = new Horse("Name1", 1, 2);
-        Horse name2 = new Horse("Name2", 1, 2);
-        Horse name3 = new Horse("Name3", 1, 2);
-        Horse name4 = new Horse("Name4", 5, 20);
+    public void checkWinnerWhenHorseDistanceHasMoreThenOther() {
+        List<Horse> horseList = new ArrayList<>();
 
-        List<Horse> horseList = new ArrayList<>(){{
-           add(name1);
-           add(name2);
-           add(name3);
-           add(name4);
-        }};
+        Horse horse1 = new Horse("Name1", 1, 20);
+        Horse horse2 = new Horse("Name2", 1, 30);
+
+        horseList.add(horse1);
+        horseList.add(horse2);
 
         Hippodrome hippodrome = new Hippodrome(horseList);
-        Assert.assertSame(name4, hippodrome.getWinner());
+        Horse actualWinner = hippodrome.getWinner();
+
+        Assert.assertSame(horse2, actualWinner);
     }
 
 }
